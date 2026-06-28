@@ -1,48 +1,244 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PBA Login</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>PBA Banking System</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b1220;
+  color:white;
+}
+
+.card{
+  width:320px;
+  margin:100px auto;
+  padding:20px;
+  background:rgba(255,255,255,0.08);
+  border-radius:12px;
+  text-align:center;
+}
+
+input,button{
+  width:90%;
+  padding:10px;
+  margin:5px;
+}
+
+button{
+  background:#10b981;
+  border:none;
+  color:white;
+  cursor:pointer;
+}
+
+#loading{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:black;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  background:#111827;
+}
+
+.container{
+  padding:20px;
+}
+
+.toast{
+  background:#10b981;
+  padding:8px;
+  margin:5px;
+  border-radius:6px;
+}
+</style>
 </head>
+
 <body>
 
-<div class="card">
+<div id="login" class="card">
   <h2>PHILIPPINE BANKING ASSOCIATION</h2>
-
-  <input id="acc" placeholder="Account Number">
+  <input id="acc" placeholder="Account ID">
   <input id="pass" type="password" placeholder="Password">
-
   <button onclick="login()">LOGIN</button>
 </div>
 
 <div id="loading">
-  <h2>🔒 Connecting to Bank Server...</h2>
+  <h2>Connecting to Secure Bank Server...</h2>
 </div>
 
-<script src="accounts.js"></script>
+<div id="app" style="display:none">
+
+  <div class="topbar">
+    <span id="name"></span>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="container">
+
+    <h2 id="balance"></h2>
+
+    <button onclick="cashIn()">Cash In</button>
+    <button onclick="withdraw()">Withdraw</button>
+    <button onclick="transfer()">Transfer (GCash/Maya/KOOP)</button>
+
+    <canvas id="chart"></canvas>
+
+    <h3>Transactions</h3>
+    <div id="tx"></div>
+
+  </div>
+
+</div>
 
 <script>
+// 🔥 100+ FAKE ACCOUNTS
+const accounts = [];
+
+for(let i=1;i<=120;i++){
+  accounts.push({
+    account:"100000"+(3000+i),
+    password:"1234",
+    name:"User "+i,
+    balance:Math.floor(Math.random()*50000)+5000
+  });
+}
+
+let user=null;
+
+/* LOGIN */
 function login(){
-  document.getElementById("loading").style.display = "flex";
 
-  setTimeout(() => {
+  document.getElementById("loading").style.display="flex";
 
-    let a = document.getElementById("acc").value.trim();
-    let p = document.getElementById("pass").value.trim();
+  setTimeout(()=>{
 
-    let user = accounts.find(u => u.account === a && u.password === p);
+    let a=document.getElementById("acc").value.trim();
+    let p=document.getElementById("pass").value.trim();
+
+    user=accounts.find(u=>u.account===a && u.password===p);
 
     if(!user){
       alert("Invalid credentials");
-      document.getElementById("loading").style.display = "none";
+      document.getElementById("loading").style.display="none";
       return;
     }
 
-    localStorage.setItem("user", JSON.stringify(user));
-    window.location.href = "dashboard.html";
+    document.getElementById("login").style.display="none";
+    document.getElementById("loading").style.display="none";
+    document.getElementById("app").style.display="block";
 
-  }, 1200);
+    init();
+
+  },1200);
 }
+
+/* TRANSACTIONS */
+let tx=[];
+
+function addTx(type,amount,target="-"){
+  tx.push({
+    type,
+    amount,
+    target,
+    date:new Date().toLocaleString()
+  });
+}
+
+/* INIT */
+function init(){
+  document.getElementById("name").innerText="Welcome "+user.name;
+  update();
+  render();
+  chart();
+}
+
+/* UPDATE */
+function update(){
+  document.getElementById("balance").innerText="₱"+user.balance;
+}
+
+/* CASH IN */
+function cashIn(){
+  let amt=Number(prompt("Cash In:"));
+  user.balance+=amt;
+  addTx("Cash In",amt);
+  update();render();chartUpdate();
+}
+
+/* WITHDRAW */
+function withdraw(){
+  let amt=Number(prompt("Withdraw:"));
+  if(amt>user.balance)return alert("Insufficient");
+  user.balance-=amt;
+  addTx("Withdraw",amt);
+  update();render();chartUpdate();
+}
+
+/* TRANSFER */
+function transfer(){
+  let amt=Number(prompt("Amount:"));
+  let target=prompt("GCash / Maya / KOOP");
+
+  if(amt>user.balance)return alert("Insufficient");
+
+  user.balance-=amt;
+  addTx("Transfer",amt,target);
+
+  update();render();chartUpdate();
+}
+
+/* RENDER TX */
+function render(){
+  document.getElementById("tx").innerHTML=
+  tx.slice(-6).reverse().map(t=>
+    `<div class="toast">
+      ${t.type} ₱${t.amount}<br>
+      To: ${t.target}<br>
+      ${t.date}
+    </div>`
+  ).join("");
+}
+
+/* LOGOUT */
+function logout(){
+  location.reload();
+}
+
+/* CHART */
+let c;
+
+function chart(){
+  c=new Chart(document.getElementById("chart"),{
+    type:"line",
+    data:{
+      labels:["Jan","Feb","Mar","Apr","May","Jun"],
+      datasets:[{
+        label:"Spending",
+        data:[2000,3000,2500,4000,3500,5000],
+        borderColor:"#10b981",
+        fill:true
+      }]
+    }
+  });
+}
+
+function chartUpdate(){
+  c.data.datasets[0].data=c.data.datasets[0].data.map(v=>v+Math.random()*300);
+  c.update();
+}
+
 </script>
 
 </body>
