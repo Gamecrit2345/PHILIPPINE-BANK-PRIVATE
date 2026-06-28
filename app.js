@@ -5,34 +5,32 @@ if(!user){
 }
 
 document.getElementById("name").innerText = "Welcome " + user.name;
-document.getElementById("balance").innerText = "Balance ₱" + user.balance;
+document.getElementById("balance").innerText = "₱" + user.balance;
 
 function update(){
-  document.getElementById("balance").innerText = "Balance ₱" + user.balance;
+  document.getElementById("balance").innerText = "₱" + user.balance;
   localStorage.setItem("user", JSON.stringify(user));
 }
 
 function cashIn(){
-  const amt = Number(prompt("Cash In:"));
+  let amt = Number(prompt("Cash In:"));
   user.balance += amt;
 
-  addTx("Cash In", amt, user.balance);
-
+  addTransaction("Cash In", amt, user.balance);
   update();
-  render();
+  renderTx();
   updateChart();
 }
 
 function withdraw(){
-  const amt = Number(prompt("Withdraw:"));
-  if(amt > user.balance) return alert("Insufficient balance");
+  let amt = Number(prompt("Withdraw:"));
+  if(amt > user.balance) return alert("Insufficient Balance");
 
   user.balance -= amt;
 
-  addTx("Withdraw", amt, user.balance);
-
+  addTransaction("Withdraw", amt, user.balance);
   update();
-  render();
+  renderTx();
   updateChart();
 }
 
@@ -41,29 +39,30 @@ function logout(){
   location.href = "index.html";
 }
 
-function render(){
+function renderTx(){
   document.getElementById("tx").innerHTML =
     transactions.slice(-5).reverse().map(t =>
-      `<li>${t.type} - ₱${t.amount}<br>${t.date} ${t.time}</li>`
+      `<div class="toast">${t.type} ₱${t.amount} | ${t.date}</div>`
     ).join("");
 }
 
-/* MONTHLY GRAPH */
+/* CHART */
 let chart = new Chart(document.getElementById("chart"), {
   type: "line",
   data: {
     labels: ["Jan","Feb","Mar","Apr","May","Jun"],
     datasets: [{
       label: "Monthly Spending",
-      data: [1000,2000,1500,3000,2500,4000],
-      borderColor: "#10b981"
+      data: [2000,3000,2500,4000,3500,5000],
+      borderColor: "#10b981",
+      fill: true
     }]
   }
 });
 
 function updateChart(){
   chart.data.datasets[0].data = chart.data.datasets[0].data.map(v =>
-    v + Math.random()*300
+    v + Math.random()*400
   );
   chart.update();
 }
