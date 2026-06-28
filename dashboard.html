@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+</head>
+<body style="background:#0f172a;color:white;font-family:Arial">
+
+<h2 id="name"></h2>
+<h3 id="balance"></h3>
+
+<button onclick="cashIn()">Cash In</button>
+<button onclick="withdraw()">Withdraw</button>
+<button onclick="logout()">Logout</button>
+
+<script>
+let user = JSON.parse(localStorage.getItem("user"));
+if(!user){ window.location.href="index.html"; }
+
+document.getElementById("name").innerText = user.name;
+document.getElementById("balance").innerText = "Balance: ₱"+user.balance;
+
+function save(){
+  localStorage.setItem("user", JSON.stringify(user));
+  document.getElementById("balance").innerText = "Balance: ₱"+user.balance;
+}
+
+function cashIn(){
+  let amt = parseFloat(prompt("Cash in:"));
+  user.balance += amt;
+  save();
+}
+
+function withdraw(){
+  let amt = parseFloat(prompt("Withdraw:"));
+  if(amt>user.balance) return alert("No balance");
+  user.balance -= amt;
+  save();
+}
+
+function logout(){
+  localStorage.removeItem("user");
+  window.location.href="index.html";
+}
+</script>
+
+</body>
+</html>
