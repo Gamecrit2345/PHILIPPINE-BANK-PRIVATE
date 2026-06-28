@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PBA Login</title>
+  <title>PBA Ultra Bank</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,30 +13,29 @@
     <input id="acc" placeholder="Account Number">
     <input id="pass" type="password" placeholder="Password">
 
-    <button onclick="login()">LOGIN</button>
+    <button onclick="login()">SECURE LOGIN</button>
   </div>
 </div>
 
 <div id="loading">
-  <h2>Connecting to Secure Bank Server...</h2>
+  <h2>🔒 Connecting to Secure Banking Network...</h2>
 </div>
 
 <script src="accounts.js"></script>
 
 <script>
 function login(){
-
   document.getElementById("loading").style.display = "flex";
 
   setTimeout(() => {
 
-    const a = document.getElementById("acc").value;
-    const p = document.getElementById("pass").value;
+    let a = document.getElementById("acc").value;
+    let p = document.getElementById("pass").value;
 
-    const user = accounts.find(u => u.account === a && u.password === p);
+    let user = accounts.find(u => u.account === a && u.password === p);
 
     if(!user){
-      alert("Invalid login");
+      alert("Invalid Credentials");
       document.getElementById("loading").style.display = "none";
       return;
     }
