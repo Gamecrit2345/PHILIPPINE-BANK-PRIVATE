@@ -4,21 +4,21 @@
   <title>PBA Login</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="center">
+<body>
 
-<div class="card">
-  <h1>PHILIPPINE BANKING ASSOCIATION</h1>
+<div class="container">
+  <div class="card">
+    <h2>PHILIPPINE BANKING ASSOCIATION</h2>
 
-  <input id="acc" placeholder="Account Number">
-  <input id="pass" type="password" placeholder="Password">
+    <input id="acc" placeholder="Account Number">
+    <input id="pass" type="password" placeholder="Password">
 
-  <button onclick="login()">LOGIN</button>
+    <button onclick="login()">LOGIN</button>
+  </div>
 </div>
 
-<!-- LOADING -->
 <div id="loading">
-  <div class="spinner"></div>
-  <p>Connecting to secure bank server...</p>
+  <h2>Connecting to Secure Bank Server...</h2>
 </div>
 
 <script src="accounts.js"></script>
@@ -36,7 +36,7 @@ function login(){
     let user = accounts.find(u => u.account === a && u.password === p);
 
     if(!user){
-      alert("Invalid login");
+      alert("Invalid Login");
       document.getElementById("loading").style.display = "none";
       return;
     }
@@ -44,7 +44,7 @@ function login(){
     localStorage.setItem("user", JSON.stringify(user));
     window.location.href = "dashboard.html";
 
-  }, 1500);
+  }, 1200);
 }
 </script>
 
