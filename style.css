@@ -1,83 +1,51 @@
 body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: radial-gradient(circle,#0f172a,#020617);
-  color: white;
+  margin:0;
+  font-family: Arial;
+  background:#0b1220;
+  color:white;
 }
 
-/* LOGIN CARD */
 .card {
-  background: rgba(255,255,255,0.06);
-  padding: 25px;
-  border-radius: 18px;
-  width: 340px;
-  text-align: center;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 0 20px rgba(16,185,129,0.3);
+  width:320px;
+  margin:100px auto;
+  padding:20px;
+  background:rgba(255,255,255,0.08);
+  border-radius:12px;
+  text-align:center;
 }
 
-input {
-  width: 90%;
-  padding: 12px;
-  margin: 6px;
-  border-radius: 10px;
-  border: none;
+input, button {
+  width:90%;
+  padding:10px;
+  margin:5px;
 }
 
 button {
-  width: 95%;
-  padding: 12px;
-  margin-top: 8px;
-  border: none;
-  border-radius: 10px;
-  background: #10b981;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
+  background:#10b981;
+  border:none;
+  color:white;
+  cursor:pointer;
 }
 
-button:hover {
-  transform: scale(1.03);
-  background: #059669;
-}
-
-/* TOP BAR */
 .topbar {
   display:flex;
   justify-content:space-between;
   padding:15px;
-  background:#0b1220;
+  background:#111827;
 }
 
-/* DASHBOARD LAYOUT */
-.container {
-  padding: 20px;
-  text-align:center;
-}
-
-/* LOADING */
 #loading {
   display:none;
   position:fixed;
   inset:0;
-  background: rgba(0,0,0,0.95);
+  background:black;
   justify-content:center;
   align-items:center;
-  flex-direction:column;
 }
 
-/* TOAST */
 .toast {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #10b981;
-  padding: 12px 18px;
-  border-radius: 10px;
-  animation: fade 0.3s ease;
-}
-
-@keyframes fade {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  background:#10b981;
+  margin:5px;
+  padding:10px;
+  border-radius:8px;
 }
