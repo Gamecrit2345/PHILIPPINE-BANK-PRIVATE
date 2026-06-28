@@ -2,46 +2,34 @@
 <html>
 <head>
   <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body style="background:#0f172a;color:white;font-family:Arial">
+<body>
 
-<h2 id="name"></h2>
-<h3 id="balance"></h3>
+<div class="topbar">
+  <h2>PBA DASHBOARD</h2>
+  <button onclick="logout()">Logout</button>
+</div>
 
-<button onclick="cashIn()">Cash In</button>
-<button onclick="withdraw()">Withdraw</button>
-<button onclick="logout()">Logout</button>
+<div class="card big">
+  <h2 id="name"></h2>
+  <h3 id="balance"></h3>
 
-<script>
-let user = JSON.parse(localStorage.getItem("user"));
-if(!user){ window.location.href="index.html"; }
+  <button onclick="cashIn()">Cash In</button>
+  <button onclick="withdraw()">Withdraw</button>
+</div>
 
-document.getElementById("name").innerText = user.name;
-document.getElementById("balance").innerText = "Balance: ₱"+user.balance;
+<canvas id="chart"></canvas>
 
-function save(){
-  localStorage.setItem("user", JSON.stringify(user));
-  document.getElementById("balance").innerText = "Balance: ₱"+user.balance;
-}
+<div class="card">
+  <h3>Transactions</h3>
+  <ul id="tx"></ul>
+</div>
 
-function cashIn(){
-  let amt = parseFloat(prompt("Cash in:"));
-  user.balance += amt;
-  save();
-}
-
-function withdraw(){
-  let amt = parseFloat(prompt("Withdraw:"));
-  if(amt>user.balance) return alert("No balance");
-  user.balance -= amt;
-  save();
-}
-
-function logout(){
-  localStorage.removeItem("user");
-  window.location.href="index.html";
-}
-</script>
+<script src="transactions.js"></script>
+<script src="accounts.js"></script>
+<script src="dashboard.js"></script>
 
 </body>
 </html>
