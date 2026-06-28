@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PBA Bank</title>
+  <meta charset="UTF-8">
+</head>
+<body style="background:#0f172a;color:white;text-align:center;padding-top:100px;font-family:Arial">
+
+<h1>PHILIPPINE BANKING ASSOCIATION</h1>
+
+<input id="acc" placeholder="Account"><br><br>
+<input id="pass" type="password" placeholder="Password"><br><br>
+
+<button onclick="login()">LOGIN</button>
+
+<script>
+const accounts = [
+  {account:"100000000001", password:"123456", name:"Juan", balance:10000}
+];
+
+function login(){
+  let a = document.getElementById("acc").value;
+  let p = document.getElementById("pass").value;
+
+  let user = accounts.find(x => x.account===a && x.password===p);
+
+  if(!user){
+    alert("Invalid");
+    return;
+  }
+
+  localStorage.setItem("user", JSON.stringify(user));
+  window.location.href="dashboard.html";
+}
+</script>
+
+</body>
+</html>
