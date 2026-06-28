@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>PBA Bank</title>
-  <meta charset="UTF-8">
+  <title>PBA Login</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body style="background:#0f172a;color:white;text-align:center;padding-top:100px;font-family:Arial">
+<body class="center">
 
-<h1>PHILIPPINE BANKING ASSOCIATION</h1>
+<div class="card">
+  <h1>PHILIPPINE BANKING ASSOCIATION</h1>
 
-<input id="acc" placeholder="Account"><br><br>
-<input id="pass" type="password" placeholder="Password"><br><br>
+  <input id="acc" placeholder="Account Number">
+  <input id="pass" type="password" placeholder="Password">
 
-<button onclick="login()">LOGIN</button>
+  <button onclick="login()">LOGIN</button>
+</div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="spinner"></div>
+  <p>Connecting to secure bank server...</p>
+</div>
+
+<script src="accounts.js"></script>
 
 <script>
-const accounts = [
-  {account:"100000000001", password:"123456", name:"Juan", balance:10000}
-];
-
 function login(){
-  let a = document.getElementById("acc").value;
-  let p = document.getElementById("pass").value;
 
-  let user = accounts.find(x => x.account===a && x.password===p);
+  document.getElementById("loading").style.display = "flex";
 
-  if(!user){
-    alert("Invalid");
-    return;
-  }
+  setTimeout(() => {
 
-  localStorage.setItem("user", JSON.stringify(user));
-  window.location.href="dashboard.html";
+    let a = document.getElementById("acc").value;
+    let p = document.getElementById("pass").value;
+
+    let user = accounts.find(u => u.account === a && u.password === p);
+
+    if(!user){
+      alert("Invalid login");
+      document.getElementById("loading").style.display = "none";
+      return;
+    }
+
+    localStorage.setItem("user", JSON.stringify(user));
+    window.location.href = "dashboard.html";
+
+  }, 1500);
 }
 </script>
 
