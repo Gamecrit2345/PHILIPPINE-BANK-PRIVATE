@@ -1,107 +1,88 @@
-
 let user = JSON.parse(localStorage.getItem("user"));
 
-if (!user) {
+if(!user){
   window.location.href = "index.html";
 }
 
 document.getElementById("name").innerText = "Welcome " + user.name;
 
-/* BALANCE DISPLAY */
-function update() {
+function getKey(){
+  return "tx_" + user.account;
+}
+
+function getTx(){
+  return JSON.parse(localStorage.getItem(getKey())) || [];
+}
+
+function saveTx(tx){
+  localStorage.setItem(getKey(), JSON.stringify(tx));
+}
+
+function update(){
   document.getElementById("balance").innerText = "₱" + user.balance;
   localStorage.setItem("user", JSON.stringify(user));
 }
 
-/* TRANSACTION STORAGE (PER USER) */
-function getKey(user) {
-  return "tx_" + user.account;
-}
+function addTx(type, amount, target="-"){
+  let tx = getTx();
 
-function getTransactions(user) {
-  return JSON.parse(localStorage.getItem(getKey(user))) || [];
-}
-
-function saveTransactions(user, txs) {
-  localStorage.setItem(getKey(user), JSON.stringify(txs));
-}
-
-function addTransaction(type, amount, target = "-") {
-  let txs = getTransactions(user);
-
-  const now = new Date();
-
-  txs.push({
+  tx.push({
     type,
     amount,
     target,
-    date: now.toLocaleDateString(),
-    time: now.toLocaleTimeString()
+    date: new Date().toLocaleDateString(),
+    time: new Date().toLocaleTimeString()
   });
 
-  saveTransactions(user, txs);
+  saveTx(tx);
 }
 
-/* CASH IN */
-function cashIn() {
+function cashIn(){
   let amt = Number(prompt("Cash In:"));
-  if (!amt) return;
+  if(!amt) return;
 
   user.balance += amt;
 
-  addTransaction("Cash In", amt);
+  addTx("Cash In", amt);
 
   update();
-  renderTx();
-  updateChart();
+  render();
+  chartUpdate();
 }
 
-/* WITHDRAW */
-function withdraw() {
+function withdraw(){
   let amt = Number(prompt("Withdraw:"));
-  if (!amt) return;
-
-  if (amt > user.balance) {
-    alert("Insufficient Balance");
-    return;
-  }
+  if(amt > user.balance) return alert("Insufficient");
 
   user.balance -= amt;
 
-  addTransaction("Withdraw", amt);
+  addTx("Withdraw", amt);
 
   update();
-  renderTx();
-  updateChart();
+  render();
+  chartUpdate();
 }
 
-/* TRANSFER (GCASH / MAYA / KOOP) */
-function transfer() {
-  let amt = Number(prompt("Transfer amount:"));
-  let target = prompt("Send to (GCash / Maya / KOOP):");
+function transfer(){
+  let amt = Number(prompt("Amount:"));
+  let target = prompt("GCash / Maya / KOOP:");
 
-  if (!amt || !target) return;
-
-  if (amt > user.balance) {
-    alert("Insufficient Balance");
-    return;
-  }
+  if(amt > user.balance) return alert("Insufficient");
 
   user.balance -= amt;
 
-  addTransaction("Transfer to " + target, amt, target);
+  addTx("Transfer", amt, target);
 
   update();
-  renderTx();
-  updateChart();
+  render();
+  chartUpdate();
 }
 
-/* TRANSACTION RENDER */
-function renderTx() {
-  let txs = getTransactions(user);
+function render(){
+  let tx = getTx();
 
   document.getElementById("tx").innerHTML =
-    txs.slice(-5).reverse().map(t =>
+    tx.slice(-5).reverse().map(t =>
       `<div class="toast">
         ${t.type} ₱${t.amount}<br>
         To: ${t.target}<br>
@@ -110,8 +91,7 @@ function renderTx() {
     ).join("");
 }
 
-/* LOGOUT */
-function logout() {
+function logout(){
   localStorage.removeItem("user");
   location.href = "index.html";
 }
@@ -120,23 +100,23 @@ function logout() {
 let chart = new Chart(document.getElementById("chart"), {
   type: "line",
   data: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: ["Jan","Feb","Mar","Apr","May","Jun"],
     datasets: [{
       label: "Monthly Spending",
-      data: [2000, 3000, 2500, 4000, 3500, 5000],
+      data: [2000,3000,2500,4000,3500,5000],
       borderColor: "#10b981",
       fill: true
     }]
   }
 });
 
-function updateChart() {
+function chartUpdate(){
   chart.data.datasets[0].data = chart.data.datasets[0].data.map(v =>
-    v + Math.random() * 300
+    v + Math.random()*300
   );
   chart.update();
 }
 
 /* INIT */
 update();
-renderTx();
+render();
