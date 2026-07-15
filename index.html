@@ -1,245 +1,332 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>PBA Banking System</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHILIPPINE BANK PRIVATE</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --blue: #0a2540;
+            --darkblue: #051c2e;
+            --gold: #d4af37;
+            --lightgold: #f0d38a;
+        }
 
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0b1220;
-  color:white;
-}
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--darkblue);
+            color: white;
+            min-height: 100vh;
+        }
 
-.card{
-  width:320px;
-  margin:100px auto;
-  padding:20px;
-  background:rgba(255,255,255,0.08);
-  border-radius:12px;
-  text-align:center;
-}
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: var(--blue);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
 
-input,button{
-  width:90%;
-  padding:10px;
-  margin:5px;
-}
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--gold);
+        }
 
-button{
-  background:#10b981;
-  border:none;
-  color:white;
-  cursor:pointer;
-}
+        .card {
+            width: 380px;
+            margin: 80px auto;
+            padding: 30px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
 
-#loading{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:black;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-}
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-  background:#111827;
-}
+        input::placeholder {
+            color: #aaa;
+        }
 
-.container{
-  padding:20px;
-}
+        button {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: var(--gold);
+            color: #0a2540;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
 
-.toast{
-  background:#10b981;
-  padding:8px;
-  margin:5px;
-  border-radius:6px;
-}
-</style>
+        button:hover {
+            background: var(--lightgold);
+            transform: translateY(-2px);
+        }
+
+        #loading {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 28, 46, 0.95);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--blue), #0f2b4f);
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid var(--gold);
+            margin-bottom: 25px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .toast {
+            background: rgba(212, 175, 55, 0.15);
+            border-left: 4px solid var(--gold);
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .header {
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
-
 <body>
+    <!-- LOGIN -->
+    <div id="login" class="card">
+        <h2 style="color: var(--gold);">PHILIPPINE BANK PRIVATE</h2>
+        <p>Secure Online Banking</p>
+        <input id="acc" placeholder="Account ID" autocomplete="off">
+        <input id="pass" type="password" placeholder="Password">
+        <button onclick="login()">LOGIN SECURELY</button>
+    </div>
 
-<div id="login" class="card">
-  <h2>PHILIPPINE BANKING ASSOCIATION</h2>
-  <input id="acc" placeholder="Account ID">
-  <input id="pass" type="password" placeholder="Password">
-  <button onclick="login()">LOGIN</button>
-</div>
+    <!-- LOADING -->
+    <div id="loading">
+        <h2 style="color: var(--gold);">Connecting to Secure Server...</h2>
+        <p>Please wait</p>
+    </div>
 
-<div id="loading">
-  <h2>Connecting to Secure Bank Server...</h2>
-</div>
+    <!-- MAIN APP -->
+    <div id="app" style="display:none">
+        <div class="topbar">
+            <div class="logo">PBP</div>
+            <div>
+                <span id="welcome"></span> &nbsp; | &nbsp; 
+                <span id="user-id" style="color:var(--lightgold);"></span>
+                <button onclick="logout()" style="width:auto; padding:8px 16px; margin-left:15px;">Logout</button>
+            </div>
+        </div>
 
-<div id="app" style="display:none">
+        <div class="container">
+            <div class="balance-card">
+                <h3 style="margin:0; color:#ccc;">Available Balance</h3>
+                <h1 id="balance" style="margin:10px 0; font-size:42px; color:var(--gold);">₱0.00</h1>
+            </div>
 
-  <div class="topbar">
-    <span id="name"></span>
-    <button onclick="logout()">Logout</button>
-  </div>
+            <div class="quick-actions">
+                <button onclick="cashIn()">Cash In</button>
+                <button onclick="withdraw()">Withdraw</button>
+                <button onclick="transfer()">Transfer</button>
+                <button onclick="payBills()">Pay Bills</button>
+                <button onclick="loanInquiry()">Loan Inquiry</button>
+            </div>
 
-  <div class="container">
+            <canvas id="chart" style="margin:30px 0;"></canvas>
 
-    <h2 id="balance"></h2>
+            <h3 class="header">Recent Transactions</h3>
+            <div id="tx"></div>
+        </div>
+    </div>
 
-    <button onclick="cashIn()">Cash In</button>
-    <button onclick="withdraw()">Withdraw</button>
-    <button onclick="transfer()">Transfer (GCash/Maya/KOOP)</button>
+    <script>
+        // Fake Accounts (only these will work)
+        const accounts = [
+            { account: "100000573092", password: "765432", name: "Denton Admin" },
+            { account: "100000573178", password: "657844", name: "Jhez Employee" },
+            { account: "10000065318",  password: "984053", name: "Brent Customer" },
+            { account: "10000074829",  password: "783947", name: "Aadam Customer" },
+            { account: "10000097394",  password: "264934", name: "Sam Customer" },
+            { account: "10000089384",  password: "173856", name: "Mike Customer" },
+            { account: "10000082305",  password: "846271", name: "Patrick Customer" },
+            { account: "10000078364",  password: "694629", name: "Jared V. Customer" }
+        ];
 
-    <canvas id="chart"></canvas>
+        let user = null;
+        let tx = [];
+        let chartInstance;
 
-    <h3>Transactions</h3>
-    <div id="tx"></div>
+        function login() {
+            document.getElementById("loading").style.display = "flex";
 
-  </div>
+            setTimeout(() => {
+                const a = document.getElementById("acc").value.trim();
+                const p = document.getElementById("pass").value.trim();
 
-</div>
+                user = accounts.find(u => u.account === a && u.password === p);
 
-<script>
-// 🔥 100+ FAKE ACCOUNTS
-const accounts = [];
+                if (!user) {
+                    alert("Invalid Account ID or Password");
+                    document.getElementById("loading").style.display = "none";
+                    return;
+                }
 
-for(let i=1;i<=120;i++){
-  accounts.push({
-    account:"100000"+(3000+i),
-    password:"1234",
-    name:"User "+i,
-    balance:Math.floor(Math.random()*50000)+5000
-  });
-}
+                document.getElementById("login").style.display = "none";
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("app").style.display = "block";
 
-let user=null;
+                initApp();
+            }, 1500);
+        }
 
-/* LOGIN */
-function login(){
+        function initApp() {
+            document.getElementById("welcome").innerHTML = `Welcome, <strong>${user.name}</strong>`;
+            document.getElementById("user-id").textContent = `ID: ${user.account}`;
+            user.balance = Math.floor(Math.random() * 85000) + 15000; // random starting balance
+            updateBalance();
+            renderTransactions();
+            createChart();
+        }
 
-  document.getElementById("loading").style.display="flex";
+        function updateBalance() {
+            document.getElementById("balance").textContent = `₱${user.balance.toLocaleString('en-US')}`;
+        }
 
-  setTimeout(()=>{
+        function addTx(type, amount, target = "—") {
+            tx.unshift({
+                type,
+                amount,
+                target,
+                date: new Date().toLocaleString()
+            });
+        }
 
-    let a=document.getElementById("acc").value.trim();
-    let p=document.getElementById("pass").value.trim();
+        function cashIn() {
+            const amt = Number(prompt("Enter Cash In Amount:"));
+            if (!amt || amt <= 0) return;
+            user.balance += amt;
+            addTx("Cash In", amt);
+            updateBalance();
+            renderTransactions();
+            updateChart();
+        }
 
-    user=accounts.find(u=>u.account===a && u.password===p);
+        function withdraw() {
+            const amt = Number(prompt("Enter Withdraw Amount:"));
+            if (!amt || amt <= 0) return;
+            if (amt > user.balance) return alert("Insufficient Balance");
+            user.balance -= amt;
+            addTx("Withdraw", amt);
+            updateBalance();
+            renderTransactions();
+            updateChart();
+        }
 
-    if(!user){
-      alert("Invalid credentials");
-      document.getElementById("loading").style.display="none";
-      return;
-    }
+        function transfer() {
+            const amt = Number(prompt("Enter Transfer Amount:"));
+            if (!amt || amt <= 0) return;
+            if (amt > user.balance) return alert("Insufficient Balance");
+            const target = prompt("Enter Recipient (GCash / Maya / Account No):") || "External";
+            user.balance -= amt;
+            addTx("Transfer", amt, target);
+            updateBalance();
+            renderTransactions();
+            updateChart();
+        }
 
-    document.getElementById("login").style.display="none";
-    document.getElementById("loading").style.display="none";
-    document.getElementById("app").style.display="block";
+        function payBills() {
+            alert("Bill Payment feature coming soon.\n\n(For demo: Try Cash In / Withdraw first)");
+        }
 
-    init();
+        function loanInquiry() {
+            alert("Loan Inquiry\n\nYour pre-approved loan limit: ₱250,000\nInterest rate: 8.5% p.a.\n\nContact our Loan Officer for details.");
+        }
 
-  },1200);
-}
+        function renderTransactions() {
+            const txDiv = document.getElementById("tx");
+            txDiv.innerHTML = tx.slice(0, 8).map(t => `
+                <div class="toast">
+                    <strong>${t.type}</strong><br>
+                    ₱${t.amount.toLocaleString()} ${t.type.includes("Withdraw") || t.type.includes("Transfer") ? '—' : '+'}<br>
+                    To: ${t.target}<br>
+                    <small>${t.date}</small>
+                </div>
+            `).join('');
+        }
 
-/* TRANSACTIONS */
-let tx=[];
+        function createChart() {
+            const ctx = document.getElementById("chart");
+            chartInstance = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+                    datasets: [{
+                        label: "Account Balance Trend",
+                        data: [user.balance * 0.6, user.balance * 0.75, user.balance * 0.85, user.balance * 0.9, user.balance * 0.95, user.balance],
+                        borderColor: "#d4af37",
+                        backgroundColor: "rgba(212, 175, 55, 0.15)",
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, labels: { color: "white" } } },
+                    scales: { y: { grid: { color: "#334455" }, ticks: { color: "#aaa" } }, x: { ticks: { color: "#aaa" } } }
+                }
+            });
+        }
 
-function addTx(type,amount,target="-"){
-  tx.push({
-    type,
-    amount,
-    target,
-    date:new Date().toLocaleString()
-  });
-}
+        function updateChart() {
+            if (chartInstance) {
+                const last = chartInstance.data.datasets[0].data[5];
+                chartInstance.data.datasets[0].data.push(last + (Math.random() * 8000 - 3000));
+                chartInstance.data.datasets[0].data.shift();
+                chartInstance.update();
+            }
+        }
 
-/* INIT */
-function init(){
-  document.getElementById("name").innerText="Welcome "+user.name;
-  update();
-  render();
-  chart();
-}
-
-/* UPDATE */
-function update(){
-  document.getElementById("balance").innerText="₱"+user.balance;
-}
-
-/* CASH IN */
-function cashIn(){
-  let amt=Number(prompt("Cash In:"));
-  user.balance+=amt;
-  addTx("Cash In",amt);
-  update();render();chartUpdate();
-}
-
-/* WITHDRAW */
-function withdraw(){
-  let amt=Number(prompt("Withdraw:"));
-  if(amt>user.balance)return alert("Insufficient");
-  user.balance-=amt;
-  addTx("Withdraw",amt);
-  update();render();chartUpdate();
-}
-
-/* TRANSFER */
-function transfer(){
-  let amt=Number(prompt("Amount:"));
-  let target=prompt("GCash / Maya / KOOP");
-
-  if(amt>user.balance)return alert("Insufficient");
-
-  user.balance-=amt;
-  addTx("Transfer",amt,target);
-
-  update();render();chartUpdate();
-}
-
-/* RENDER TX */
-function render(){
-  document.getElementById("tx").innerHTML=
-  tx.slice(-6).reverse().map(t=>
-    `<div class="toast">
-      ${t.type} ₱${t.amount}<br>
-      To: ${t.target}<br>
-      ${t.date}
-    </div>`
-  ).join("");
-}
-
-/* LOGOUT */
-function logout(){
-  location.reload();
-}
-
-/* CHART */
-let c;
-
-function chart(){
-  c=new Chart(document.getElementById("chart"),{
-    type:"line",
-    data:{
-      labels:["Jan","Feb","Mar","Apr","May","Jun"],
-      datasets:[{
-        label:"Spending",
-        data:[2000,3000,2500,4000,3500,5000],
-        borderColor:"#10b981",
-        fill:true
-      }]
-    }
-  });
-}
-
-function chartUpdate(){
-  c.data.datasets[0].data=c.data.datasets[0].data.map(v=>v+Math.random()*300);
-  c.update();
-}
-
-</script>
-
+        function logout() {
+            location.reload();
+        }
+    </script>
 </body>
 </html>
